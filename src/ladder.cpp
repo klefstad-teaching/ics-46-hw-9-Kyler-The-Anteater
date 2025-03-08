@@ -10,11 +10,15 @@ string lowercase(string str) {
 }
 bool edit_distance_within(const string& str1, const string& str2, int d) {
     // differing by 1 (add/remove)
+    if (d > 1) return false;
+    if (str1 == str2) return true;
+
     if (d == 1) {
         //Remove
-        string larger, smaller;
-        if (str1.size() > str2.size()) {larger = str1; smaller = str2;}
-        else {larger = str2; smaller = str1;}
+        string larger = str1.size() > str2.size() ? str1 : str2;
+        string smaller = str1.size() > str2.size() ? str2 : str1;
+        larger = lowercase(larger);
+        smaller = lowercase(smaller);
         for (int i = 0; i < larger.size(); ++i) {
             string rem = larger;
             rem.erase(i, 1);
@@ -58,14 +62,13 @@ vector<string> generate_word_ladder(const string& begin_word, const string& end_
         for (string word : word_list)
             if (is_adjacent(last_word, word))
                 if (visited.find(word) == visited.end()) {
-                    visited.insert(word);
                     vector<string> new_ladder = ladder;
                     new_ladder.push_back(word);
                     if (word == end_word) return new_ladder;
+                    visited.insert(word);
                     ladder_queue.push(new_ladder);
                 }
     }
-    cout << "No word ladder found.\n";
     return {};
 }
 void load_words(set<string> & word_list, const string& file_name) {
@@ -75,6 +78,8 @@ void load_words(set<string> & word_list, const string& file_name) {
         word_list.insert(word);
 }
 void print_word_ladder(const vector<string>& ladder) {
+    if (ladder.empty())
+        cout << "No word ladder found.\n";
     for (string s : ladder)
         cout << s << " ";
 }
