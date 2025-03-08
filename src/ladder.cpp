@@ -9,64 +9,87 @@ string lowercase(string str) {
     return str;
 }
 bool edit_distance_within(const string& str1, const string& str2, int d) {
-    int len1 = str1.size(), len2 = str2.size();
-    if (d > 1 || fabs(len1 - len2) > 1) return false;
     if (str1 == str2) return true;
-
-    //string s1 = lowercase(str1), s2 = lowercase(str2);
+    
+    int len1 = str1.size(), len2 = str2.size();
+    if (d > 1 || abs(len1 - len2) > 1) return false;
 
     int diff = 0;
 
-    if (d == 1) {
-        //Remove
-        string larger = len1 > len2 ? str1 : str2;
-        string smaller = len1 > len2 ? str2 : str1;
-        int i = 0, j = 0;
-        while (i < larger.size() && j < smaller.size()) {
-            if (larger[i] != smaller[j]) {
-                if (++diff > 1) return false; 
-                ++i;
-            }
-            else {++i; ++j;}
-        }
-        return true;
+    if (len1 == len2) {
+        for (int i = 0; i < len1; ++i)
+            if (str1[i] != str2[i] && (++diff) > 1)
+                return false;
+        return diff == 1;
     }
-    //differing by 0 (change a letter)
-    int s = str1.size();
-    diff = 0;
-    for (int i = 0; i < s; ++i) {
-        if (str1[i] != str2[i])
+
+    int i = 0, j = 0;
+    while (i < len1 && j < len2) {
+        if (str1[i] != str2[j]) {
             if (++diff > 1) return false;
+            len1 > len2 ? ++i : ++j;
+        } else {++i; ++j;}
     }
-    return diff == 1;
+    return true;
+
+    // if (d == 1) {
+    //     //Remove
+    //     string larger = len1 > len2 ? str1 : str2;
+    //     string smaller = len1 > len2 ? str2 : str1;
+    //     int i = 0, j = 0;
+    //     while (i < larger.size() && j < smaller.size()) {
+    //         if (larger[i] != smaller[j]) {
+    //             if (++diff > 1) return false; 
+    //             ++i;
+    //         }
+    //         else {++i; ++j;}
+    //     }
+    //     return true;
+    // }
+    // //differing by 0 (change a letter)
+    // int s = str1.size();
+    // diff = 0;
+    // for (int i = 0; i < s; ++i) {
+    //     if (str1[i] != str2[i])
+    //         if (++diff > 1) return false;
+    // }
+    // return diff == 1;
 }
 bool is_adjacent(const string& word1, const string& word2) {
-    size_t len1 = word1.size(), len2 = word2.size();
-    int dist = len1 > len2 ? len1 - len2 : len2 - len1;
-    return edit_distance_within(word1, word2, dist);
+    return edit_distance_within(word1, word2, abs((int)word1.size() - (int)word2.size()));
 }
 vector<string> generate_word_ladder(const string& begin_word, const string& end_word, const set<string>& word_list) {
-    if (begin_word == end_word) {
-        cout << "No word ladder found.\n";
-        return {};
-    }
+    set<string> wordSet(word_list);
+    if (begin_word == end_word || wordSet.find(end_word) == wordSet.end()) return {};
+
     queue<vector<string>> ladder_queue;
     ladder_queue.push({begin_word});
     set<string> visited;
     visited.insert(begin_word);
 
     while (!ladder_queue.empty()) {
-        vector<string> ladder = ladder_queue.front();
-        ladder_queue.pop();
-        string last_word = ladder.back();
-        for (string word : word_list)
-            if (is_adjacent(last_word, word) && visited.count(word) == 0) {
-                visited.insert(word);
-                vector<string> new_ladder = ladder;
-                new_ladder.push_back(word);
-                if (word == end_word) return new_ladder;
-                ladder_queue.push(new_ladder);
-            }
+        int level = ladder_queue.size();
+        set<string> remove;
+        // vector<string> ladder = ladder_queue.front();
+        // ladder_queue.pop();
+        // string last_word = ladder.back();
+        for (int i = 0; i < level; ++i) {
+            vector<string> ladder = ladder_queue.front();
+            ladder_queue.pop();
+            string last_word = ladder.back();
+
+            for (const string& word : wordSet)
+                if (is_adjacent(last_word, word) && visited.find(word) == visited.end()) {
+                    //visited.insert(word);
+                    vector<string> new_ladder = ladder;
+                    new_ladder.push_back(word);
+                    if (word == end_word) return new_ladder;
+                    ladder_queue.push(new_ladder);
+                    remove.insert(word);
+                }
+        }
+        for (const string& word : remove)
+            visited.insert(word);
     }  
     return {};
 }
