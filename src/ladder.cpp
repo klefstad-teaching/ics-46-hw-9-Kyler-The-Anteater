@@ -30,8 +30,11 @@ bool edit_distance_within(const string& str1, const string& str2, int d) {
     return false;
 }
 bool is_adjacent(const string& word1, const string& word2) {
-    int distance = fabs(word1.size() - word2.size());
-    return distance >= 2 ? false : edit_distance_within(word1, word2, distance);
+    size_t len1 = word1.size(), len2 = word2.size();
+    int dist;
+    if (len1 > len2) dist = len1 - len2;
+    else dist = len2 - len1;
+    return dist >= 2 ? false : edit_distance_within(word1, word2, dist);
 }
 vector<string> generate_word_ladder(const string& begin_word, const string& end_word, const set<string>& word_list) {
     if (begin_word == end_word) {
@@ -57,10 +60,11 @@ vector<string> generate_word_ladder(const string& begin_word, const string& end_
                     ladder_queue.push(new_ladder);
                 }
     }
+    cout << "No word ladder found.\n";
     return {};
 }
 void load_words(set<string> & word_list, const string& file_name) {
-    ifstream in("../src/" + file_name);
+    ifstream in(file_name);
     string word;
     while (in >> word)
         word_list.insert(word);
@@ -72,6 +76,7 @@ void print_word_ladder(const vector<string>& ladder) {
 void verify_word_ladder() {
     set<string> word_list;
     load_words(word_list, "../src/words.txt");
+    cout << word_list.empty() << endl;
     vector<string> wl = generate_word_ladder("Cat", "dog", word_list);
     print_word_ladder(wl);
 }
