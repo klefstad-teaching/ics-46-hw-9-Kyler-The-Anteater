@@ -39,6 +39,7 @@ vector<int> extract_shortest_path(const vector<int>& distances, const vector<int
     return path;
 }
 void print_path(const vector<int>& v, int total) {
-    for (int i = 0; i < total; ++i) 
-        cout << v[i] << endl;
+    for (int i : v) 
+        cout << i << " ";
+    cout << "Total cost is " << total << endl;
 }
