@@ -5,7 +5,7 @@ void error(string word1, string word2, string msg) {
 }
 bool edit_distance_within(const string& str1, const string& str2, int d) {
     int len1 = str1.size(), len2 = str2.size();
-    if (abs(len1 - len2) > d) return false;
+    if (d > 1 || fabs(len1 - len2) > 1) return false;
 
     int diff = 0;
 
