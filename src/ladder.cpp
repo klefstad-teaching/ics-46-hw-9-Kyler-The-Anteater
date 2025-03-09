@@ -4,6 +4,8 @@ void error(string word1, string word2, string msg) {
     cerr << word1 << " " << msg << " " << word2 << endl;
 }
 bool edit_distance_within(const string& str1, const string& str2, int d) {
+    if (str1 == str2) return true;
+    
     int len1 = str1.size(), len2 = str2.size();
     if (d > 1 || fabs(len1 - len2) > 1) return false;
 
